@@ -30,20 +30,33 @@ class MainHandler(webapp2.RequestHandler):
         verify = self.request.get('verify')
         email = self.request.get('email')
 
-#        v_username = valid_username(username)
-#        v_password = valid_username(password)
-#        v_verify = valid_username(verify)
-#        v_email  = valid_username(email)
+        v_username = valid_username(username)
+        v_password = valid_username(password)
+        v_verify = valid_username(verify)
+        v_email  = valid_username(email)
+        #print variables to  gae log
+        print("username = " + str(username), "v_username = " + str(v_username))
+        print("password = " + str(password), "v_password = " + str(v_password))
+        print("verify = " + str(verify), "v_verify = " + str(v_verify))
+        print("email = " + str(email), "v_email = " + str(v_email))
 
+        d = {"username":username,
+             "password":password,
+             "verify":verify,
+             "email":email}
+        print("d.getUsername == " + d.get('username',username))
+        print("d.getPassword == " + d.get('password',password))
+        print("d.getVerify == " + d.get('verify',verify))
+        print("d.geteMail == " + d.get('email',email))
         #verify 3 required fields were filled in correctly
 
-#        if (v_username and v_password and v_verify):
-        if (username == ""):
-            #self.rewrite_form(username, password, verify, email)
-            self.response.write(self.build_form(username=username, password=password,verify=verify,email=email))
+        #        if (v_username and v_password and v_verify):
+        if  (v_username and v_password and v_verify):
+            self.redirect("/welcome?username=%(username)s"%d)
             #self.redirect("/?error=" + "error message")
         else:
-            self.redirect("/welcome")
+            # Upon valid user input, your web app should redirect to a welcome page for the user.
+            self.response.write(self.build_form(username="%(username)s"%d,password="%(password)s"%d,verify="%(verify)s"%d,email="%(email)s"%d))
 
 
 #signup_form = MainHandler()
@@ -66,10 +79,11 @@ class MainHandler(webapp2.RequestHandler):
                 email_label + email_input + "<br>" +\
                 submit + "</form>"
 
-            return header + form % {"username":username, "password":password,
-                                      "verify":verify,
-                                      "email":email,
-                                      "error":error}
+            return header + form % {"username":username,
+                                    "password":password,
+                                    "verify":verify,
+                                    "email":email,
+                                    "error":error}
 
 def valid_username(username):
     if username:
@@ -84,8 +98,10 @@ def valid_password(password):
 def valid_verify(verify):
     if verify:
         x_verify = cgi.escape(verify, quote=True)
-        #if password == verify:
-        return x_verify
+        if x_password == x_verify:
+            return x_verify
+        else:
+            return "Passwords do not match."
 
 def valid_email(email):
     if email:
@@ -94,7 +110,11 @@ def valid_email(email):
 
 class WelcomePage(webapp2.RequestHandler):
     def get(self):
-        self.response.write("Welcome ")
+        username = self.request.get('username')
+        d = {"username":username}
+        # This page must include both "Welcome" and the user's username.
+        self.response.write("Welcome %(username)s"%d)
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
