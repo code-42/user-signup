@@ -65,14 +65,14 @@ class MainHandler(webapp2.RequestHandler):
         else:
             V_ERROR = " Your passwords didn't match."
 
-        #print variables to  gae log
+        # print variables to  gae log for debugging
         print("d.getUsername == " + d.get('username',username))
         print("d.geteMail == " + d.get('email',email))
 
         if (v_username == False or v_password == False or v_verify == False or v_email == False):
-            #print variables to  gae log
-            print("parms == ",username,email,password,verify)
-            # pass in username and email make them sticky
+            # print variables to  gae log for debugging
+            print("form variables == ",username,email,password,verify)
+            # pass in username and email to make them sticky
             username = d.get('username',username)
             email = d.get('email',email)
             # clear password fields for security
